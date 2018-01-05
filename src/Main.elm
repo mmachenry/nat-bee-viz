@@ -3,7 +3,6 @@
 TODO
 
 necessary:
-  * implement svg drawing of concentric circles
   * implement svg drawing of spiral
 
 visual upgrade:
@@ -17,7 +16,7 @@ additional features:
 
 -}
 
-import Html exposing (Html, Attribute, button, div, text, textarea, input, table, tr, td, th )
+import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Svg exposing (svg)
@@ -47,7 +46,7 @@ update : Msg -> Model -> Model
 update msg model =
   case msg of
     EditData str -> { model | inputData = str }
-    ChangeTab currentTab -> { model | currentTab = currentTab }
+    ChangeTab tab -> { model | currentTab = tab }
 
 view : Model -> Html Msg
 view model =
@@ -97,9 +96,18 @@ parseErrorDisplay : String -> Html Msg
 parseErrorDisplay str = div [] [text ("Parser error: " ++ str)]
 
 buttonBar : Tab -> Html Msg
-buttonBar view =
-    let makeButton (v, name) =
-            button [disabled (view == v), onClick (ChangeTab v)] [text name]
+buttonBar tab =
+    let makeButton (t, name) =
+            button [
+                style [
+                    ("padding", "10px"),
+                    ("color", if tab == t then "grey" else "white"),
+                    ("background-color", "blue"),
+                    ("border", "none"),
+                    ("margin", "2px")],
+                disabled (tab == t),
+                onClick (ChangeTab t)]
+                [text name]
     in div [] (List.map makeButton [
                   (Edit,"Edit"),
                   (Image,"Image"),
@@ -107,5 +115,5 @@ buttonBar view =
 
 documentation : Html Msg
 documentation = div [] [
-    div [] [text "Hey, Nat! Here's a quick user interface for entering bee data. There will be better documentation and settings controls where you can change the colors, line thickness, and radii coming. I'm also working on the spiral version to see if that looks any better. For now, this should let you play with the view without having to send me the data to run the program. Just cut and paste a CSV file into the edit box here, click on image to see what it looks like, or table to see what the parsed data looks like in a table. The CSV needs to have a header. This is the one it's using below. The first line you cut and paste into the box should be that line and all subsequent lines should be data."],
-    div [] [ text "\"\",\"Date_PST\",\"Time_end\",\"Time_start\",\"Date_PST_start\",\"overnight\",\"guarding\",\"pforage\",\"prob.sanitation\""]]
+    p [] [text "Hey, Nat! Here's a quick user interface for entering bee data. There will be better documentation and settings controls where you can change the colors, line thickness, and radii coming. I'm also working on the spiral version to see if that looks any better. For now, this should let you play with the view without having to send me the data to run the program. Just cut and paste a CSV file into the edit box here, click on image to see what it looks like, or table to see what the parsed data looks like in a table. The CSV needs to have a header. This is the one it's using below. The first line you cut and paste into the box should be that line and all subsequent lines should be data."],
+    p [] [ text "\"\",\"Date_PST\",\"Time_end\",\"Time_start\",\"Date_PST_start\",\"overnight\",\"guarding\",\"pforage\",\"prob.sanitation\""]]
