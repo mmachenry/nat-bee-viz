@@ -11775,7 +11775,7 @@ var _user$project$Main$documentation = A2(
 	{
 		ctor: '::',
 		_0: A2(
-			_elm_lang$html$Html$div,
+			_elm_lang$html$Html$p,
 			{ctor: '[]'},
 			{
 				ctor: '::',
@@ -11785,7 +11785,7 @@ var _user$project$Main$documentation = A2(
 		_1: {
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$div,
+				_elm_lang$html$Html$p,
 				{ctor: '[]'},
 				{
 					ctor: '::',
@@ -11927,7 +11927,7 @@ var _user$project$Main$initModel = {inputData: '', currentTab: _user$project$Mai
 var _user$project$Main$ChangeTab = function (a) {
 	return {ctor: 'ChangeTab', _0: a};
 };
-var _user$project$Main$buttonBar = function (view) {
+var _user$project$Main$buttonBar = function (tab) {
 	var makeButton = function (_p3) {
 		var _p4 = _p3;
 		var _p5 = _p4._0;
@@ -11935,13 +11935,42 @@ var _user$project$Main$buttonBar = function (view) {
 			_elm_lang$html$Html$button,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$disabled(
-					_elm_lang$core$Native_Utils.eq(view, _p5)),
+				_0: _elm_lang$html$Html_Attributes$style(
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'padding', _1: '10px'},
+						_1: {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: 'color',
+								_1: _elm_lang$core$Native_Utils.eq(tab, _p5) ? 'grey' : 'white'
+							},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'blue'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'border', _1: 'none'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'margin', _1: '2px'},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Main$ChangeTab(_p5)),
-					_1: {ctor: '[]'}
+					_0: _elm_lang$html$Html_Attributes$disabled(
+						_elm_lang$core$Native_Utils.eq(tab, _p5)),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(
+							_user$project$Main$ChangeTab(_p5)),
+						_1: {ctor: '[]'}
+					}
 				}
 			},
 			{

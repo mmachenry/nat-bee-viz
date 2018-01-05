@@ -19,10 +19,10 @@ additional features:
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Svg exposing (svg)
-import Svg.Attributes exposing (width, height, viewBox)
+import Svg
+import Svg.Attributes
 import BeeTrip exposing (BeeTrip)
-import ParseBee exposing (..)
+import ParseBee exposing (parseBeeData)
 import DrawBee
 import Time.DateTime
 
@@ -73,11 +73,11 @@ editView model =
 
 imageView : Model -> Html Msg
 imageView model =
-  case parseBeeData model.inputData of
+  case ParseBee.parseBeeData model.inputData of
     Ok beeTrips ->
-        svg [ Svg.Attributes.width "600",
-              Svg.Attributes.height "600",
-              Svg.Attributes.viewBox "0 0 600 600" ]
+        Svg.svg [ Svg.Attributes.width "600",
+                  Svg.Attributes.height "600",
+                  Svg.Attributes.viewBox "0 0 600 600" ]
             (DrawBee.drawConcentricCircles beeTrips)
     Err str -> parseErrorDisplay str        
 
