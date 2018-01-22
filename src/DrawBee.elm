@@ -96,8 +96,8 @@ splitTripsOfDayBreak trips =
         splitTrip trip =
             if date trip.start == date trip.end
             then [trip]
-            else [ BeeTrip trip.start (setTime trip.start endOfDay),
-                   BeeTrip (setTime trip.end startOfDay) trip.end ]
+            else [ BeeTrip trip.uid trip.start (setTime trip.start endOfDay),
+                   BeeTrip trip.uid (setTime trip.end startOfDay) trip.end ]
     in concatMap splitTrip trips
 
 

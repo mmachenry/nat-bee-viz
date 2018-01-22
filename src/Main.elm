@@ -1,52 +1,72 @@
-{-
-
-TODO
-
-necessary:
-  * implement svg drawing of spiral
-
-visual upgrade:
-  * separate the buttons and the text box a little maybe
-  * dynamically control the height of the text input
-  * make the table look nicer and potentially have sorting
-
-additional features:
-  * create a settings page to control the drawing parameters
-  * make it possible to eliminate certain rows from being displayed in the table
-
--}
+port module Main exposing (main)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, on)
 import Svg
 import Svg.Attributes
 import BeeTrip exposing (BeeTrip)
 import ParseBee exposing (parseBeeData)
 import DrawBee
 import Time.DateTime
+import Json.Decode as JD
 
-main = Html.beginnerProgram { model = initModel, view = view, update = update }
+port fileSelected : String -> Cmd msg
+port fileContentRead : (CSVPortData -> msg) -> Sub msg
+
+main = Html.program {
+    init = (initModel, Cmd.none),
+    view = view,
+    update = update,
+    subscriptions = subscriptions
+    }
+
+type alias CSVPortData = {
+    contents : String,
+    filename : String
+    }
 
 type alias Model = {
-  inputData : String,
-  currentTab : Tab
-  }
+    csvFilename : Maybe String,
+    error : Maybe String,
+    beeTrips : List BeeTrip,
+    currentTab : Tab
+    }
 
 type Tab = Edit | Table | Image
 
 initModel : Model
-initModel = { inputData = "", currentTab = Edit }
+initModel = {
+    csvFilename = Nothing,
+    error = Nothing,
+    beeTrips = [],
+    currentTab = Edit
+    }
 
 type Msg =
-      EditData String
-    | ChangeTab Tab
+      ChangeTab Tab
+    | CSVSelected
+    | CSVParse CSVPortData
 
-update : Msg -> Model -> Model
-update msg model =
-  case msg of
-    EditData str -> { model | inputData = str }
-    ChangeTab tab -> { model | currentTab = tab }
+subscriptions : Model -> Sub Msg
+subscriptions model = fileContentRead CSVParse
+
+update : Msg -> Model -> (Model, Cmd msg)
+update msg model = case msg of
+    ChangeTab tab -> ({ model | currentTab = tab }, Cmd.none)
+    CSVSelected -> (model, fileSelected "CSVInput")
+    CSVParse data ->
+        case ParseBee.parseBeeData data.contents of
+            Ok beeTrips -> ({ model |
+                beeTrips = beeTrips,
+                csvFilename = Just data.filename,
+                error = Nothing
+                }, Cmd.none)
+            Err str -> ({ model |
+                beeTrips = [],
+                csvFilename = Just data.filename,
+                error = Just str
+                }, Cmd.none)
 
 view : Model -> Html Msg
 view model =
@@ -55,7 +75,8 @@ view model =
               ("margin-right", "5%"),
               ("margin-top","30px")] ] [
         documentation,
-        div [ style [("text-align", "right")]] [ buttonBar model.currentTab ],
+        div [ style [("text-align", "right")]]
+            [ buttonBar model.currentTab ],
         div [ style [("text-align", "center")] ] [
             case model.currentTab of
               Edit -> editView model
@@ -65,32 +86,28 @@ view model =
 editView : Model -> Html Msg
 editView model =
     div [] [
-        textarea [ placeholder "CSV Data goes here",
-                   onInput EditData,
-                   rows 30,
-                   style [("width","100%")] ] [
-            text model.inputData ]]
+        input [ type_ "file",
+                id "CSVInput",
+                on "change" (JD.succeed CSVSelected)] [],
+        div [] [ case model.error of
+                   Nothing -> text "no error"
+                   Just str -> text str ]
+        ]
 
 imageView : Model -> Html Msg
 imageView model =
-  case ParseBee.parseBeeData model.inputData of
-    Ok beeTrips ->
-        Svg.svg [ Svg.Attributes.width "600",
-                  Svg.Attributes.height "600",
-                  Svg.Attributes.viewBox "0 0 600 600" ]
-            (DrawBee.drawConcentricCircles beeTrips)
-    Err str -> parseErrorDisplay str        
+    Svg.svg [ Svg.Attributes.width "600",
+              Svg.Attributes.height "600",
+              Svg.Attributes.viewBox "0 0 600 600" ]
+        (DrawBee.drawConcentricCircles model.beeTrips)
 
 tableView : Model -> Html Msg
 tableView model =
   let makeRow trip = tr [] [makeCell trip.start, makeCell trip.end]
       makeCell date = td [] [ text (Time.DateTime.toISO8601 date) ]
-  in case parseBeeData model.inputData of
-       Ok beeTrips ->
-        table [ style [("border","1")] ]
-            ((tr [] [td [] [text "Start Time"], td [] [text "End Time"]]) ::
-             (List.map makeRow beeTrips))
-       Err str -> parseErrorDisplay str
+  in table [ style [("border","1")] ]
+         ((tr [] [td [] [text "Start Time"], td [] [text "End Time"]]) ::
+          (List.map makeRow model.beeTrips))
 
 parseErrorDisplay : String -> Html Msg
 parseErrorDisplay str = div [] [text ("Parser error: " ++ str)]

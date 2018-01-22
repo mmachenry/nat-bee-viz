@@ -1,7 +1,6 @@
 module ParseBee exposing (parseBeeData)
 
 import Maybe
---import Maybe.Extra
 import Result
 import Result.Extra
 import Csv
@@ -16,12 +15,15 @@ parseBeeData inputStr =
 
 rowToBeeTrip : List String -> Result String BeeTrip
 rowToBeeTrip row =
-    Result.andThen
+  Result.andThen
+    (\uid->
+      Result.andThen
         (\start->
-            Result.andThen
-                (\end->Ok (BeeTrip start end))
-                (parseDateAndTimeFrom row 1 2))
-        (parseDateAndTimeFrom row 4 3)
+          Result.andThen
+            (\end->Ok (BeeTrip uid start end))
+            (parseDateAndTimeFrom row 2 3))
+        (parseDateAndTimeFrom row 5 4))
+    (Result.fromMaybe "out of bounds" (listAt 1 row))
 
 parseDateAndTimeFrom : List String -> Int -> Int -> Result String DateTime
 parseDateAndTimeFrom row dateIndex timeIndex =
