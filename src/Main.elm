@@ -94,18 +94,23 @@ fileUpload model =
                    Just str -> text str ] ]
 
 beeView : List BeeTrip -> Html Msg
-beeView trips = div [style [("display","flex")]] [
-    div [] [tableView trips],
-    imageView (600, 600) trips ]
+beeView trips =
+  div [] [
+    div [style [("background-color","blue"),
+                ("color", "white"),
+                ("margin-top", "20px")]] [
+        text (Maybe.withDefault "error"
+                 (Maybe.map .uid (List.head trips))) ],
+    div [style [("display","flex")]] [
+      div [] [tableView trips],
+      imageView (600, 600) trips ] ]
 
 tableView : List BeeTrip -> Html Msg
 tableView trips =
-  let makeRow trip = tr [] [
-          cell trip.uid, dateCell trip.start, dateCell trip.end]
+  let makeRow trip = tr [] [dateCell trip.start, dateCell trip.end]
       cell str = td [] [ text str ]
       dateCell date = cell (Time.DateTime.toISO8601 date)
       header = tr [] [
-          td [] [text "UID"],
           td [] [text "Start Time"],
           td [] [text "End Time"]]
       rows = List.map makeRow trips

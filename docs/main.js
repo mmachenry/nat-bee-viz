@@ -13410,7 +13410,7 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('UID'),
+					_0: _elm_lang$html$Html$text('Start Time'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -13420,21 +13420,10 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Start Time'),
+						_0: _elm_lang$html$Html$text('End Time'),
 						_1: {ctor: '[]'}
 					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$td,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('End Time'),
-							_1: {ctor: '[]'}
-						}),
-					_1: {ctor: '[]'}
-				}
+				_1: {ctor: '[]'}
 			}
 		});
 	var cell = function (str) {
@@ -13457,15 +13446,11 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 			{ctor: '[]'},
 			{
 				ctor: '::',
-				_0: cell(trip.uid),
+				_0: dateCell(trip.start),
 				_1: {
 					ctor: '::',
-					_0: dateCell(trip.start),
-					_1: {
-						ctor: '::',
-						_0: dateCell(trip.end),
-						_1: {ctor: '[]'}
-					}
+					_0: dateCell(trip.end),
+					_1: {ctor: '[]'}
 				}
 			});
 	};
@@ -13487,32 +13472,76 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 var _mmachenry$nat_bee_viz$Main$beeView = function (trips) {
 	return A2(
 		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'display', _1: 'flex'},
-					_1: {ctor: '[]'}
-				}),
-			_1: {ctor: '[]'}
-		},
+		{ctor: '[]'},
 		{
 			ctor: '::',
 			_0: A2(
 				_elm_lang$html$Html$div,
-				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _mmachenry$nat_bee_viz$Main$tableView(trips),
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'blue'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '20px'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(
+						A2(
+							_elm_lang$core$Maybe$withDefault,
+							'error',
+							A2(
+								_elm_lang$core$Maybe$map,
+								function (_) {
+									return _.uid;
+								},
+								_elm_lang$core$List$head(trips)))),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_mmachenry$nat_bee_viz$Main$imageView,
-					{ctor: '_Tuple2', _0: 600, _1: 600},
-					trips),
+					_elm_lang$html$Html$div,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _mmachenry$nat_bee_viz$Main$tableView(trips),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_mmachenry$nat_bee_viz$Main$imageView,
+								{ctor: '_Tuple2', _0: 600, _1: 600},
+								trips),
+							_1: {ctor: '[]'}
+						}
+					}),
 				_1: {ctor: '[]'}
 			}
 		});
