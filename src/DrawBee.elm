@@ -9,29 +9,37 @@ import Time.Date exposing (Date, delta)
 import Html exposing (Html)
 import BeeTrip exposing (..)
 
+type alias DrawParams = {
+    width : Float,
+    height : Float
+    }
+
 type alias ArcData = {
     numDay : Int,
     startAngle : Float,
     endAngle : Float
     }
 
-centerX = 300
-centerY = 300
 strokeWidth_ = 5
 startRadius = 20
 
-drawConcentricCircles : List BeeTrip -> List (Svg a)
-drawConcentricCircles trips =
-    List.map describeArc (tripsToArcData (splitTripsOfDayBreak trips))
+drawConcentricCircles : DrawParams -> List BeeTrip -> List (Svg a)
+drawConcentricCircles params trips =
+    List.map (describeArc params) (tripsToArcData (splitTripsOfDayBreak trips))
 
-describeArc : ArcData -> Svg a
-describeArc arc =
-    let radius = numberedDayToRadius arc.numDay
+describeArc : DrawParams -> ArcData -> Svg a
+describeArc params arc =
+    let centerX = params.width / 2
+        centerY = params.width / 2
+        radius = numberedDayToRadius arc.numDay
         (startX, startY) = polarToCartesian (radius, arc.startAngle)
         (endX, endY) = polarToCartesian (radius, arc.endAngle)
         largeArcFlag =
             (arc.startAngle > arc.endAngle)
             == (arc.endAngle - arc.startAngle > pi)
+        polarToCartesian (radius, angle) =
+            (centerX + radius * cos angle, centerY - radius * sin angle)
+
     in Svg.path [
         fill "none",
         stroke "black",
@@ -50,9 +58,6 @@ arcPath startX startY radius largeArcFlag endX endY =
 
 numberedDayToRadius : Int -> Float
 numberedDayToRadius n = startRadius + toFloat n * strokeWidth_
-
-polarToCartesian (radius, angle) =
-    (centerX + radius * cos angle, centerY - radius * sin angle)
 
 tripsToArcData : List BeeTrip -> List ArcData
 tripsToArcData trips = case trips of

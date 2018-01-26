@@ -7,9 +7,10 @@ import Svg
 import Svg.Attributes
 import BeeTrip exposing (BeeTrip)
 import ParseBee exposing (parseBeeData)
-import DrawBee
+import DrawBee exposing (drawConcentricCircles, DrawParams)
 import Time.DateTime
 import Json.Decode as JD
+import List.Extra exposing (groupWhileTransitively)
 
 port fileSelected : String -> Cmd msg
 port fileContentRead : (CSVPortData -> msg) -> Sub msg
@@ -33,7 +34,7 @@ type alias Model = {
     currentTab : Tab
     }
 
-type Tab = Edit | Table | Image
+type Tab = Edit | Image
 
 initModel : Model
 initModel = {
@@ -45,7 +46,7 @@ initModel = {
 
 type Msg =
       ChangeTab Tab
-    | CSVSelected
+    | CSVSelected String
     | CSVParse CSVPortData
 
 subscriptions : Model -> Sub Msg
@@ -54,7 +55,7 @@ subscriptions model = fileContentRead CSVParse
 update : Msg -> Model -> (Model, Cmd msg)
 update msg model = case msg of
     ChangeTab tab -> ({ model | currentTab = tab }, Cmd.none)
-    CSVSelected -> (model, fileSelected "CSVInput")
+    CSVSelected elementId -> (model, fileSelected elementId)
     CSVParse data ->
         case ParseBee.parseBeeData data.contents of
             Ok beeTrips -> ({ model |
@@ -74,40 +75,50 @@ view model =
               ("margin-left", "5%"),
               ("margin-right", "5%"),
               ("margin-top","30px")] ] [
-        documentation,
-        div [ style [("text-align", "right")]]
-            [ buttonBar model.currentTab ],
-        div [ style [("text-align", "center")] ] [
-            case model.currentTab of
-              Edit -> editView model
-              Table -> tableView model
-              Image -> imageView model ]]
+        fileUpload model,
+        div [] (List.map beeView
+                   (groupWhileTransitively
+                     (\t1 t2->t1.uid == t2.uid)
+                     (List.sortWith (\t1 t2->compare t1.uid t2.uid)
+                                    model.beeTrips))) ]
 
-editView : Model -> Html Msg
-editView model =
+fileUpload : Model -> Html Msg
+fileUpload model =
     div [] [
         input [ type_ "file",
                 id "CSVInput",
-                on "change" (JD.succeed CSVSelected)] [],
+                on "change" (JD.succeed (CSVSelected "CSVInput"))] [],
+        -- FIX ME make this div hidden if no error
         div [] [ case model.error of
-                   Nothing -> text "no error"
-                   Just str -> text str ]
-        ]
+                   Nothing -> text ""
+                   Just str -> text str ] ]
 
-imageView : Model -> Html Msg
-imageView model =
-    Svg.svg [ Svg.Attributes.width "600",
-              Svg.Attributes.height "600",
-              Svg.Attributes.viewBox "0 0 600 600" ]
-        (DrawBee.drawConcentricCircles model.beeTrips)
+beeView : List BeeTrip -> Html Msg
+beeView trips = div [style [("display","flex")]] [
+    div [] [tableView trips],
+    imageView (600, 600) trips ]
 
-tableView : Model -> Html Msg
-tableView model =
-  let makeRow trip = tr [] [makeCell trip.start, makeCell trip.end]
-      makeCell date = td [] [ text (Time.DateTime.toISO8601 date) ]
-  in table [ style [("border","1")] ]
-         ((tr [] [td [] [text "Start Time"], td [] [text "End Time"]]) ::
-          (List.map makeRow model.beeTrips))
+tableView : List BeeTrip -> Html Msg
+tableView trips =
+  let makeRow trip = tr [] [
+          cell trip.uid, dateCell trip.start, dateCell trip.end]
+      cell str = td [] [ text str ]
+      dateCell date = cell (Time.DateTime.toISO8601 date)
+      header = tr [] [
+          td [] [text "UID"],
+          td [] [text "Start Time"],
+          td [] [text "End Time"]]
+      rows = List.map makeRow trips
+  in table [ style [("border","1")] ] (header :: rows)
+
+imageView : (Float, Float) -> List BeeTrip -> Html Msg
+imageView (width, height) trips =
+    let w = toString width
+        h = toString height
+    in Svg.svg [ Svg.Attributes.width w,
+                 Svg.Attributes.height h,
+                 Svg.Attributes.viewBox ("0 0 " ++ w ++ " " ++ h) ]
+               (drawConcentricCircles (DrawParams width height) trips)
 
 parseErrorDisplay : String -> Html Msg
 parseErrorDisplay str = div [] [text ("Parser error: " ++ str)]
@@ -127,10 +138,4 @@ buttonBar tab =
                 [text name]
     in div [] (List.map makeButton [
                   (Edit,"Edit"),
-                  (Image,"Image"),
-                  (Table,"Table")])
-
-documentation : Html Msg
-documentation = div [] [
-    p [] [text "Hey, Nat! Here's a quick user interface for entering bee data. There will be better documentation and settings controls where you can change the colors, line thickness, and radii coming. I'm also working on the spiral version to see if that looks any better. For now, this should let you play with the view without having to send me the data to run the program. Just cut and paste a CSV file into the edit box here, click on image to see what it looks like, or table to see what the parsed data looks like in a table. The CSV needs to have a header. This is the one it's using below. The first line you cut and paste into the box should be that line and all subsequent lines should be data."],
-    p [] [ text "\"\",\"Date_PST\",\"Time_end\",\"Time_start\",\"Date_PST_start\",\"overnight\",\"guarding\",\"pforage\",\"prob.sanitation\""]]
+                  (Image,"Image")])
