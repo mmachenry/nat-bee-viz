@@ -13199,7 +13199,7 @@ var _mmachenry$nat_bee_viz$DrawBee$polarToCartesian = function (_p4) {
 };
 var _mmachenry$nat_bee_viz$DrawBee$arcClockwise = F3(
 	function (r, startAngle, endAngle) {
-		var sweepFlag = true;
+		var sweepFlag = false;
 		var largeArcFlag = (_elm_lang$core$Native_Utils.cmp(startAngle, endAngle) > 0) ? (_elm_lang$core$Native_Utils.cmp(startAngle - endAngle, _elm_lang$core$Basics$pi) > 0) : (_elm_lang$core$Native_Utils.cmp(endAngle - startAngle, _elm_lang$core$Basics$pi) < 0);
 		var _p8 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
 			{ctor: '_Tuple2', _0: r, _1: endAngle});

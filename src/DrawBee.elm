@@ -47,7 +47,7 @@ arcClockwise r startAngle endAngle =
             if startAngle > endAngle
             then startAngle - endAngle > pi
             else endAngle - startAngle < pi
-        sweepFlag = True
+        sweepFlag = False
     in arcPath startX startY r largeArcFlag sweepFlag endX endY
 
 arcPath : Float -> Float -> Float -> Bool -> Bool -> Float -> Float -> String
