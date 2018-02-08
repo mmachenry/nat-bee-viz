@@ -13136,80 +13136,85 @@ var _mmachenry$nat_bee_viz$DrawBee$diffDays = F2(
 	function (d1, d2) {
 		return A2(_elm_community$elm_time$Time_Date$delta, d1, d2).days;
 	});
-var _mmachenry$nat_bee_viz$DrawBee$arcPath = F6(
-	function (startX, startY, radius, largeArcFlag, endX, endY) {
+var _mmachenry$nat_bee_viz$DrawBee$arcPath = F7(
+	function (startX, startY, radius, largeArcFlag, sweepFlag, endX, endY) {
 		return A2(
-			_elm_lang$core$Basics_ops['++'],
-			'M ',
-			A2(
-				_elm_lang$core$Basics_ops['++'],
-				_elm_lang$core$Basics$toString(startX),
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					',',
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_elm_lang$core$Basics$toString(startY),
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							' A ',
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_elm_lang$core$Basics$toString(radius),
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									' ',
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_elm_lang$core$Basics$toString(radius),
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											' 0 ',
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												largeArcFlag ? '1' : '0',
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													' 1 ',
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														_elm_lang$core$Basics$toString(endX),
-														A2(
-															_elm_lang$core$Basics_ops['++'],
-															',',
-															_elm_lang$core$Basics$toString(endY))))))))))))));
+			_elm_lang$core$String$join,
+			' ',
+			{
+				ctor: '::',
+				_0: 'M',
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$core$Basics$toString(startX),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$core$Basics$toString(startY),
+						_1: {
+							ctor: '::',
+							_0: 'A',
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$core$Basics$toString(radius),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Basics$toString(radius),
+									_1: {
+										ctor: '::',
+										_0: '0',
+										_1: {
+											ctor: '::',
+											_0: largeArcFlag ? '1' : '0',
+											_1: {
+												ctor: '::',
+												_0: sweepFlag ? '1' : '0',
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$core$Basics$toString(endX),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$core$Basics$toString(endY),
+														_1: {ctor: '[]'}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			});
 	});
-var _mmachenry$nat_bee_viz$DrawBee$startRadius = 20;
-var _mmachenry$nat_bee_viz$DrawBee$strokeWidth_ = 5;
-var _mmachenry$nat_bee_viz$DrawBee$numberedDayToRadius = function (n) {
-	return _mmachenry$nat_bee_viz$DrawBee$startRadius + (_elm_lang$core$Basics$toFloat(n) * _mmachenry$nat_bee_viz$DrawBee$strokeWidth_);
+var _mmachenry$nat_bee_viz$DrawBee$polarToCartesian = function (_p4) {
+	var _p5 = _p4;
+	var _p7 = _p5._0;
+	var _p6 = _p5._1;
+	return {
+		ctor: '_Tuple2',
+		_0: _p7 * _elm_lang$core$Basics$cos(_p6),
+		_1: _p7 * _elm_lang$core$Basics$sin(_p6)
+	};
 };
+var _mmachenry$nat_bee_viz$DrawBee$arcClockwise = F4(
+	function (_p8, r, startAngle, endAngle) {
+		var _p9 = _p8;
+		var sweepFlag = true;
+		var largeArcFlag = (_elm_lang$core$Native_Utils.cmp(startAngle, endAngle) > 0) ? (_elm_lang$core$Native_Utils.cmp(startAngle - endAngle, _elm_lang$core$Basics$pi) > 0) : (_elm_lang$core$Native_Utils.cmp(endAngle - startAngle, _elm_lang$core$Basics$pi) < 0);
+		var _p10 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
+			{ctor: '_Tuple2', _0: r, _1: endAngle});
+		var endX = _p10._0;
+		var endY = _p10._1;
+		var _p11 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
+			{ctor: '_Tuple2', _0: r, _1: startAngle});
+		var startX = _p11._0;
+		var startY = _p11._1;
+		return A7(_mmachenry$nat_bee_viz$DrawBee$arcPath, startX, startY, r, largeArcFlag, sweepFlag, endX, endY);
+	});
 var _mmachenry$nat_bee_viz$DrawBee$describeArc = F2(
 	function (params, arc) {
-		var largeArcFlag = _elm_lang$core$Native_Utils.eq(
-			_elm_lang$core$Native_Utils.cmp(arc.startAngle, arc.endAngle) > 0,
-			_elm_lang$core$Native_Utils.cmp(arc.endAngle - arc.startAngle, _elm_lang$core$Basics$pi) > 0);
-		var radius = _mmachenry$nat_bee_viz$DrawBee$numberedDayToRadius(arc.numDay);
-		var centerY = params.width / 2;
-		var centerX = params.width / 2;
-		var polarToCartesian = function (_p4) {
-			var _p5 = _p4;
-			var _p7 = _p5._0;
-			var _p6 = _p5._1;
-			return {
-				ctor: '_Tuple2',
-				_0: centerX + (_p7 * _elm_lang$core$Basics$cos(_p6)),
-				_1: centerY - (_p7 * _elm_lang$core$Basics$sin(_p6))
-			};
-		};
-		var _p8 = polarToCartesian(
-			{ctor: '_Tuple2', _0: radius, _1: arc.startAngle});
-		var startX = _p8._0;
-		var startY = _p8._1;
-		var _p9 = polarToCartesian(
-			{ctor: '_Tuple2', _0: radius, _1: arc.endAngle});
-		var endX = _p9._0;
-		var endY = _p9._1;
+		var radius = params.startRadius + (_elm_lang$core$Basics$toFloat(arc.numDay) * params.strokeWidth);
 		return A2(
 			_elm_lang$svg$Svg$path,
 			{
@@ -13221,11 +13226,16 @@ var _mmachenry$nat_bee_viz$DrawBee$describeArc = F2(
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$svg$Svg_Attributes$strokeWidth(
-							_elm_lang$core$Basics$toString(_mmachenry$nat_bee_viz$DrawBee$strokeWidth_)),
+							_elm_lang$core$Basics$toString(params.strokeWidth)),
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$d(
-								A6(_mmachenry$nat_bee_viz$DrawBee$arcPath, startX, startY, radius, largeArcFlag, endX, endY)),
+								A4(
+									_mmachenry$nat_bee_viz$DrawBee$arcClockwise,
+									{ctor: '_Tuple2', _0: 0, _1: 0},
+									radius,
+									arc.startAngle,
+									arc.endAngle)),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -13233,9 +13243,9 @@ var _mmachenry$nat_bee_viz$DrawBee$describeArc = F2(
 			},
 			{ctor: '[]'});
 	});
-var _mmachenry$nat_bee_viz$DrawBee$DrawParams = F2(
-	function (a, b) {
-		return {width: a, height: b};
+var _mmachenry$nat_bee_viz$DrawBee$DrawParams = F4(
+	function (a, b, c, d) {
+		return {width: a, height: b, strokeWidth: c, startRadius: d};
 	});
 var _mmachenry$nat_bee_viz$DrawBee$ArcData = F3(
 	function (a, b, c) {
@@ -13263,14 +13273,14 @@ var _mmachenry$nat_bee_viz$DrawBee$tripToArcData = F2(
 				timeTuple(trip.end)));
 	});
 var _mmachenry$nat_bee_viz$DrawBee$tripsToArcData = function (trips) {
-	var _p10 = trips;
-	if (_p10.ctor === '[]') {
+	var _p12 = trips;
+	if (_p12.ctor === '[]') {
 		return {ctor: '[]'};
 	} else {
 		return A2(
 			_elm_lang$core$List$map,
 			_mmachenry$nat_bee_viz$DrawBee$tripToArcData(
-				_elm_community$elm_time$Time_DateTime$date(_p10._0.start)),
+				_elm_community$elm_time$Time_DateTime$date(_p12._0.start)),
 			trips);
 	}
 };
@@ -13370,33 +13380,51 @@ var _mmachenry$nat_bee_viz$Main$imageView = F2(
 		var _p1 = _p0;
 		var _p3 = _p1._0;
 		var _p2 = _p1._1;
-		var h = _elm_lang$core$Basics$toString(_p2);
-		var w = _elm_lang$core$Basics$toString(_p3);
+		var ry = _p2 / 2;
+		var rx = _p3 / 2;
+		var viewBoxStr = A2(
+			_elm_lang$core$String$join,
+			' ',
+			A2(
+				_elm_lang$core$List$map,
+				_elm_lang$core$Basics$toString,
+				{
+					ctor: '::',
+					_0: 0 - rx,
+					_1: {
+						ctor: '::',
+						_0: 0 - ry,
+						_1: {
+							ctor: '::',
+							_0: _p3,
+							_1: {
+								ctor: '::',
+								_0: _p2,
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}));
 		return A2(
 			_elm_lang$svg$Svg$svg,
 			{
 				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$width(w),
+				_0: _elm_lang$svg$Svg_Attributes$width(
+					_elm_lang$core$Basics$toString(_p3)),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$height(h),
+					_0: _elm_lang$svg$Svg_Attributes$height(
+						_elm_lang$core$Basics$toString(_p2)),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$viewBox(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'0 0 ',
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									w,
-									A2(_elm_lang$core$Basics_ops['++'], ' ', h)))),
+						_0: _elm_lang$svg$Svg_Attributes$viewBox(viewBoxStr),
 						_1: {ctor: '[]'}
 					}
 				}
 			},
 			A2(
 				_mmachenry$nat_bee_viz$DrawBee$drawConcentricCircles,
-				A2(_mmachenry$nat_bee_viz$DrawBee$DrawParams, _p3, _p2),
+				A4(_mmachenry$nat_bee_viz$DrawBee$DrawParams, _p3, _p2, 5, 20),
 				trips));
 	});
 var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {

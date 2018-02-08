@@ -118,12 +118,13 @@ tableView trips =
 
 imageView : (Float, Float) -> List BeeTrip -> Html Msg
 imageView (width, height) trips =
-    let w = toString width
-        h = toString height
-    in Svg.svg [ Svg.Attributes.width w,
-                 Svg.Attributes.height h,
-                 Svg.Attributes.viewBox ("0 0 " ++ w ++ " " ++ h) ]
-               (drawConcentricCircles (DrawParams width height) trips)
+  let rx = width / 2
+      ry = height / 2
+      viewBoxStr = String.join " " (List.map toString [-rx,-ry,width,height])
+  in Svg.svg [ Svg.Attributes.width (toString width),
+               Svg.Attributes.height (toString height),
+               Svg.Attributes.viewBox viewBoxStr ]
+             (drawConcentricCircles (DrawParams width height 5 20) trips)
 
 parseErrorDisplay : String -> Html Msg
 parseErrorDisplay str = div [] [text ("Parser error: " ++ str)]

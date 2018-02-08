@@ -11,7 +11,9 @@ import BeeTrip exposing (..)
 
 type alias DrawParams = {
     width : Float,
-    height : Float
+    height : Float,
+    strokeWidth : Float,
+    startRadius : Float
     }
 
 type alias ArcData = {
@@ -20,44 +22,44 @@ type alias ArcData = {
     endAngle : Float
     }
 
-strokeWidth_ = 5
-startRadius = 20
-
 drawConcentricCircles : DrawParams -> List BeeTrip -> List (Svg a)
 drawConcentricCircles params trips =
     List.map (describeArc params) (tripsToArcData (splitTripsOfDayBreak trips))
 
 describeArc : DrawParams -> ArcData -> Svg a
 describeArc params arc =
-    let centerX = params.width / 2
-        centerY = params.width / 2
-        radius = numberedDayToRadius arc.numDay
-        (startX, startY) = polarToCartesian (radius, arc.startAngle)
-        (endX, endY) = polarToCartesian (radius, arc.endAngle)
-        largeArcFlag =
-            (arc.startAngle > arc.endAngle)
-            == (arc.endAngle - arc.startAngle > pi)
-        polarToCartesian (radius, angle) =
-            (centerX + radius * cos angle, centerY - radius * sin angle)
-
+    let radius = params.startRadius + toFloat arc.numDay * params.strokeWidth
     in Svg.path [
         fill "none",
         stroke "black",
-        strokeWidth (toString strokeWidth_),
-        d (arcPath startX startY radius largeArcFlag endX endY)
+        strokeWidth (toString params.strokeWidth),
+        d (arcClockwise radius arc.startAngle arc.endAngle)
         ] []
 
-arcPath : Float -> Float -> Float -> Bool -> Float -> Float -> String
-arcPath startX startY radius largeArcFlag endX endY =
-    "M " ++ toString startX ++ "," ++ toString startY ++
-    " A " ++ toString radius ++ " " ++ toString radius ++
-    " 0 " ++ (if largeArcFlag then "1" else "0") ++
-    " 1 " ++ toString endX ++ "," ++ toString endY
+polarToCartesian : (Float, Float) -> (Float, Float)
+polarToCartesian (radius, angle) = (radius * cos angle, radius * sin angle)
 
-  --"M 297.81387,324.90424 A 25.0,25.0 0.0 0,1 297.55502,324.88016 "
+arcClockwise : Float -> Float -> Float -> String
+arcClockwise r startAngle endAngle =
+    let (startX, startY) = polarToCartesian (r, startAngle)
+        (endX, endY) = polarToCartesian (r, endAngle)
+        largeArcFlag =
+            if startAngle > endAngle
+            then startAngle - endAngle > pi
+            else endAngle - startAngle < pi
+        sweepFlag = True
+    in arcPath startX startY r largeArcFlag sweepFlag endX endY
 
-numberedDayToRadius : Int -> Float
-numberedDayToRadius n = startRadius + toFloat n * strokeWidth_
+arcPath : Float -> Float -> Float -> Bool -> Bool -> Float -> Float -> String
+arcPath startX startY radius largeArcFlag sweepFlag endX endY =
+    String.join " " [
+        "M", toString startX, toString startY,
+        "A", toString radius, toString radius,
+        "0",
+        if largeArcFlag then "1" else "0",
+        if sweepFlag then "1" else "0",
+        toString endX, toString endY
+        ]
 
 tripsToArcData : List BeeTrip -> List ArcData
 tripsToArcData trips = case trips of
