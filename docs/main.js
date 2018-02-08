@@ -13425,6 +13425,27 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 			});
 	};
 	var rows = A2(_elm_lang$core$List$map, makeRow, trips);
+	var tableBody = A2(
+		_elm_lang$html$Html$tbody,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'height', _1: '600px'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'overflow-y', _1: 'scroll'},
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
+		rows);
 	return A2(
 		_elm_lang$html$Html$table,
 		{
@@ -13437,7 +13458,15 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 				}),
 			_1: {ctor: '[]'}
 		},
-		{ctor: '::', _0: header, _1: rows});
+		{
+			ctor: '::',
+			_0: header,
+			_1: {
+				ctor: '::',
+				_0: tableBody,
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _mmachenry$nat_bee_viz$Main$defaultParams = A4(_mmachenry$nat_bee_viz$DrawBee$DrawParams, 600, 600, 5, 20);
 var _mmachenry$nat_bee_viz$Main$imageView = function (trips) {

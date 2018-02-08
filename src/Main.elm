@@ -144,7 +144,11 @@ tableView trips =
           td [] [text "Start Time"],
           td [] [text "End Time"]]
       rows = List.map makeRow trips
-  in table [ style [("border","1")] ] (header :: rows)
+      tableBody = tbody [style [("display","block"),
+                                ("height","600px"),
+                                ("overflow-y","scroll")]]
+                        rows
+  in table [ style [("border","1")] ] [header, tableBody]
 
 imageView : List BeeTrip -> Html Msg
 imageView trips =
