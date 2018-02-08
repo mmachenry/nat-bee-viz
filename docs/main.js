@@ -13372,7 +13372,20 @@ var _mmachenry$nat_bee_viz$Main$parseErrorDisplay = function (str) {
 var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 	var header = A2(
 		_elm_lang$html$Html$tr,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-table'},
+						_1: {ctor: '[]'}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(

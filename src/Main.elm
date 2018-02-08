@@ -140,7 +140,7 @@ tableView trips =
   let makeRow trip = tr [] [dateCell trip.start, dateCell trip.end]
       cell str = td [] [ text str ]
       dateCell date = cell (Time.DateTime.toISO8601 date)
-      header = tr [] [
+      header = tr [ style [("width", "100%"), ("display", "inline-table")] ] [
           td [] [text "Start Time"],
           td [] [text "End Time"]]
       rows = List.map makeRow trips
