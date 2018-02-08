@@ -31,7 +31,7 @@ type alias Model = {
     csvFilename : Maybe String,
     error : Maybe String,
     beeTrips : List BeeTrip,
-    currentTab : Tab
+    debugIndex : Int
     }
 
 type Tab = Edit | Image
@@ -41,20 +41,23 @@ initModel = {
     csvFilename = Nothing,
     error = Nothing,
     beeTrips = [],
-    currentTab = Edit
+    debugIndex = 0
     }
 
+defaultParams : DrawParams
+defaultParams = DrawParams 600 600 5 20
+
 type Msg =
-      ChangeTab Tab
-    | CSVSelected String
+      CSVSelected String
     | CSVParse CSVPortData
+    | Decrement
+    | Increment
 
 subscriptions : Model -> Sub Msg
 subscriptions model = fileContentRead CSVParse
 
 update : Msg -> Model -> (Model, Cmd msg)
 update msg model = case msg of
-    ChangeTab tab -> ({ model | currentTab = tab }, Cmd.none)
     CSVSelected elementId -> (model, fileSelected elementId)
     CSVParse data ->
         case ParseBee.parseBeeData data.contents of
@@ -68,6 +71,8 @@ update msg model = case msg of
                 csvFilename = Just data.filename,
                 error = Just str
                 }, Cmd.none)
+    Decrement -> ({ model | debugIndex = model.debugIndex - 1 }, Cmd.none)
+    Increment -> ({ model | debugIndex = model.debugIndex + 1 }, Cmd.none)
 
 view : Model -> Html Msg
 view model =
@@ -76,11 +81,36 @@ view model =
               ("margin-right", "5%"),
               ("margin-top","30px")] ] [
         fileUpload model,
-        div [] (List.map beeView
+        if False
+        then debugView model
+        else div [] (List.map beeView
                    (groupWhileTransitively
                      (\t1 t2->t1.uid == t2.uid)
                      (List.sortWith (\t1 t2->compare t1.uid t2.uid)
-                                    model.beeTrips))) ]
+                                    model.beeTrips)))
+        ]
+
+debugView : Model -> Html Msg
+debugView model =
+    div [] [
+        div [] [
+            button [ onClick Decrement ] [ text "-" ],
+            div [] [text (toString model.debugIndex)],
+            button [ onClick Increment ] [ text "+" ]
+            ],
+        case List.head model.beeTrips of
+          Just firstTrip ->
+            case List.head (List.drop model.debugIndex model.beeTrips) of
+              Just trip ->
+                div [] [
+                    div [] [ text (toString trip) ],
+                    div [] [ text (toString (DrawBee.tripToArcData (Time.DateTime.date firstTrip.start) trip)) ],
+                    imageView [trip]
+                    ]
+              Nothing -> div [] [ text "No data" ]
+          Nothing -> div [] [ text "Empty list" ]
+        ]
+        
 
 fileUpload : Model -> Html Msg
 fileUpload model =
@@ -103,7 +133,7 @@ beeView trips =
                  (Maybe.map .uid (List.head trips))) ],
     div [style [("display","flex")]] [
       div [] [tableView trips],
-      imageView (600, 600) trips ] ]
+      imageView trips ] ]
 
 tableView : List BeeTrip -> Html Msg
 tableView trips =
@@ -116,32 +146,16 @@ tableView trips =
       rows = List.map makeRow trips
   in table [ style [("border","1")] ] (header :: rows)
 
-imageView : (Float, Float) -> List BeeTrip -> Html Msg
-imageView (width, height) trips =
-  let rx = width / 2
-      ry = height / 2
-      viewBoxStr = String.join " " (List.map toString [-rx,-ry,width,height])
-  in Svg.svg [ Svg.Attributes.width (toString width),
-               Svg.Attributes.height (toString height),
+imageView : List BeeTrip -> Html Msg
+imageView trips =
+  let rx = defaultParams.width / 2
+      ry = defaultParams.height / 2
+      viewBoxStr = String.join " "
+          (List.map toString [-rx,-ry,defaultParams.width,defaultParams.height])
+  in Svg.svg [ Svg.Attributes.width (toString defaultParams.width),
+               Svg.Attributes.height (toString defaultParams.height),
                Svg.Attributes.viewBox viewBoxStr ]
-             (drawConcentricCircles (DrawParams width height 5 20) trips)
+             (drawConcentricCircles defaultParams trips)
 
 parseErrorDisplay : String -> Html Msg
 parseErrorDisplay str = div [] [text ("Parser error: " ++ str)]
-
-buttonBar : Tab -> Html Msg
-buttonBar tab =
-    let makeButton (t, name) =
-            button [
-                style [
-                    ("padding", "10px"),
-                    ("color", if tab == t then "grey" else "white"),
-                    ("background-color", "blue"),
-                    ("border", "none"),
-                    ("margin", "2px")],
-                disabled (tab == t),
-                onClick (ChangeTab t)]
-                [text name]
-    in div [] (List.map makeButton [
-                  (Edit,"Edit"),
-                  (Image,"Image")])

@@ -13197,19 +13197,18 @@ var _mmachenry$nat_bee_viz$DrawBee$polarToCartesian = function (_p4) {
 		_1: _p7 * _elm_lang$core$Basics$sin(_p6)
 	};
 };
-var _mmachenry$nat_bee_viz$DrawBee$arcClockwise = F4(
-	function (_p8, r, startAngle, endAngle) {
-		var _p9 = _p8;
+var _mmachenry$nat_bee_viz$DrawBee$arcClockwise = F3(
+	function (r, startAngle, endAngle) {
 		var sweepFlag = true;
 		var largeArcFlag = (_elm_lang$core$Native_Utils.cmp(startAngle, endAngle) > 0) ? (_elm_lang$core$Native_Utils.cmp(startAngle - endAngle, _elm_lang$core$Basics$pi) > 0) : (_elm_lang$core$Native_Utils.cmp(endAngle - startAngle, _elm_lang$core$Basics$pi) < 0);
-		var _p10 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
+		var _p8 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
 			{ctor: '_Tuple2', _0: r, _1: endAngle});
-		var endX = _p10._0;
-		var endY = _p10._1;
-		var _p11 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
+		var endX = _p8._0;
+		var endY = _p8._1;
+		var _p9 = _mmachenry$nat_bee_viz$DrawBee$polarToCartesian(
 			{ctor: '_Tuple2', _0: r, _1: startAngle});
-		var startX = _p11._0;
-		var startY = _p11._1;
+		var startX = _p9._0;
+		var startY = _p9._1;
 		return A7(_mmachenry$nat_bee_viz$DrawBee$arcPath, startX, startY, r, largeArcFlag, sweepFlag, endX, endY);
 	});
 var _mmachenry$nat_bee_viz$DrawBee$describeArc = F2(
@@ -13230,12 +13229,7 @@ var _mmachenry$nat_bee_viz$DrawBee$describeArc = F2(
 						_1: {
 							ctor: '::',
 							_0: _elm_lang$svg$Svg_Attributes$d(
-								A4(
-									_mmachenry$nat_bee_viz$DrawBee$arcClockwise,
-									{ctor: '_Tuple2', _0: 0, _1: 0},
-									radius,
-									arc.startAngle,
-									arc.endAngle)),
+								A3(_mmachenry$nat_bee_viz$DrawBee$arcClockwise, radius, arc.startAngle, arc.endAngle)),
 							_1: {ctor: '[]'}
 						}
 					}
@@ -13273,14 +13267,14 @@ var _mmachenry$nat_bee_viz$DrawBee$tripToArcData = F2(
 				timeTuple(trip.end)));
 	});
 var _mmachenry$nat_bee_viz$DrawBee$tripsToArcData = function (trips) {
-	var _p12 = trips;
-	if (_p12.ctor === '[]') {
+	var _p10 = trips;
+	if (_p10.ctor === '[]') {
 		return {ctor: '[]'};
 	} else {
 		return A2(
 			_elm_lang$core$List$map,
 			_mmachenry$nat_bee_viz$DrawBee$tripToArcData(
-				_elm_community$elm_time$Time_DateTime$date(_p12._0.start)),
+				_elm_community$elm_time$Time_DateTime$date(_p10._0.start)),
 			trips);
 	}
 };
@@ -13375,58 +13369,6 @@ var _mmachenry$nat_bee_viz$Main$parseErrorDisplay = function (str) {
 			_1: {ctor: '[]'}
 		});
 };
-var _mmachenry$nat_bee_viz$Main$imageView = F2(
-	function (_p0, trips) {
-		var _p1 = _p0;
-		var _p3 = _p1._0;
-		var _p2 = _p1._1;
-		var ry = _p2 / 2;
-		var rx = _p3 / 2;
-		var viewBoxStr = A2(
-			_elm_lang$core$String$join,
-			' ',
-			A2(
-				_elm_lang$core$List$map,
-				_elm_lang$core$Basics$toString,
-				{
-					ctor: '::',
-					_0: 0 - rx,
-					_1: {
-						ctor: '::',
-						_0: 0 - ry,
-						_1: {
-							ctor: '::',
-							_0: _p3,
-							_1: {
-								ctor: '::',
-								_0: _p2,
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}));
-		return A2(
-			_elm_lang$svg$Svg$svg,
-			{
-				ctor: '::',
-				_0: _elm_lang$svg$Svg_Attributes$width(
-					_elm_lang$core$Basics$toString(_p3)),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$height(
-						_elm_lang$core$Basics$toString(_p2)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$viewBox(viewBoxStr),
-						_1: {ctor: '[]'}
-					}
-				}
-			},
-			A2(
-				_mmachenry$nat_bee_viz$DrawBee$drawConcentricCircles,
-				A4(_mmachenry$nat_bee_viz$DrawBee$DrawParams, _p3, _p2, 5, 20),
-				trips));
-	});
 var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 	var header = A2(
 		_elm_lang$html$Html$tr,
@@ -13497,6 +13439,52 @@ var _mmachenry$nat_bee_viz$Main$tableView = function (trips) {
 		},
 		{ctor: '::', _0: header, _1: rows});
 };
+var _mmachenry$nat_bee_viz$Main$defaultParams = A4(_mmachenry$nat_bee_viz$DrawBee$DrawParams, 600, 600, 5, 20);
+var _mmachenry$nat_bee_viz$Main$imageView = function (trips) {
+	var ry = _mmachenry$nat_bee_viz$Main$defaultParams.height / 2;
+	var rx = _mmachenry$nat_bee_viz$Main$defaultParams.width / 2;
+	var viewBoxStr = A2(
+		_elm_lang$core$String$join,
+		' ',
+		A2(
+			_elm_lang$core$List$map,
+			_elm_lang$core$Basics$toString,
+			{
+				ctor: '::',
+				_0: 0 - rx,
+				_1: {
+					ctor: '::',
+					_0: 0 - ry,
+					_1: {
+						ctor: '::',
+						_0: _mmachenry$nat_bee_viz$Main$defaultParams.width,
+						_1: {
+							ctor: '::',
+							_0: _mmachenry$nat_bee_viz$Main$defaultParams.height,
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}));
+	return A2(
+		_elm_lang$svg$Svg$svg,
+		{
+			ctor: '::',
+			_0: _elm_lang$svg$Svg_Attributes$width(
+				_elm_lang$core$Basics$toString(_mmachenry$nat_bee_viz$Main$defaultParams.width)),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$svg$Svg_Attributes$height(
+					_elm_lang$core$Basics$toString(_mmachenry$nat_bee_viz$Main$defaultParams.height)),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$viewBox(viewBoxStr),
+					_1: {ctor: '[]'}
+				}
+			}
+		},
+		A2(_mmachenry$nat_bee_viz$DrawBee$drawConcentricCircles, _mmachenry$nat_bee_viz$Main$defaultParams, trips));
+};
 var _mmachenry$nat_bee_viz$Main$beeView = function (trips) {
 	return A2(
 		_elm_lang$html$Html$div,
@@ -13563,16 +13551,19 @@ var _mmachenry$nat_bee_viz$Main$beeView = function (trips) {
 							}),
 						_1: {
 							ctor: '::',
-							_0: A2(
-								_mmachenry$nat_bee_viz$Main$imageView,
-								{ctor: '_Tuple2', _0: 600, _1: 600},
-								trips),
+							_0: _mmachenry$nat_bee_viz$Main$imageView(trips),
 							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {ctor: '[]'}
 			}
 		});
+};
+var _mmachenry$nat_bee_viz$Main$initModel = {
+	csvFilename: _elm_lang$core$Maybe$Nothing,
+	error: _elm_lang$core$Maybe$Nothing,
+	beeTrips: {ctor: '[]'},
+	debugIndex: 0
 };
 var _mmachenry$nat_bee_viz$Main$fileSelected = _elm_lang$core$Native_Platform.outgoingPort(
 	'fileSelected',
@@ -13581,33 +13572,25 @@ var _mmachenry$nat_bee_viz$Main$fileSelected = _elm_lang$core$Native_Platform.ou
 	});
 var _mmachenry$nat_bee_viz$Main$update = F2(
 	function (msg, model) {
-		var _p4 = msg;
-		switch (_p4.ctor) {
-			case 'ChangeTab':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{currentTab: _p4._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
+		var _p0 = msg;
+		switch (_p0.ctor) {
 			case 'CSVSelected':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _mmachenry$nat_bee_viz$Main$fileSelected(_p4._0)
+					_1: _mmachenry$nat_bee_viz$Main$fileSelected(_p0._0)
 				};
-			default:
-				var _p6 = _p4._0;
-				var _p5 = _mmachenry$nat_bee_viz$ParseBee$parseBeeData(_p6.contents);
-				if (_p5.ctor === 'Ok') {
+			case 'CSVParse':
+				var _p2 = _p0._0;
+				var _p1 = _mmachenry$nat_bee_viz$ParseBee$parseBeeData(_p2.contents);
+				if (_p1.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								beeTrips: _p5._0,
-								csvFilename: _elm_lang$core$Maybe$Just(_p6.filename),
+								beeTrips: _p1._0,
+								csvFilename: _elm_lang$core$Maybe$Just(_p2.filename),
 								error: _elm_lang$core$Maybe$Nothing
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
@@ -13619,12 +13602,28 @@ var _mmachenry$nat_bee_viz$Main$update = F2(
 							model,
 							{
 								beeTrips: {ctor: '[]'},
-								csvFilename: _elm_lang$core$Maybe$Just(_p6.filename),
-								error: _elm_lang$core$Maybe$Just(_p5._0)
+								csvFilename: _elm_lang$core$Maybe$Just(_p2.filename),
+								error: _elm_lang$core$Maybe$Just(_p1._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
+			case 'Decrement':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{debugIndex: model.debugIndex - 1}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{debugIndex: model.debugIndex + 1}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 		}
 	});
 var _mmachenry$nat_bee_viz$Main$fileContentRead = _elm_lang$core$Native_Platform.incomingPort(
@@ -13647,15 +13646,138 @@ var _mmachenry$nat_bee_viz$Main$CSVPortData = F2(
 	});
 var _mmachenry$nat_bee_viz$Main$Model = F4(
 	function (a, b, c, d) {
-		return {csvFilename: a, error: b, beeTrips: c, currentTab: d};
+		return {csvFilename: a, error: b, beeTrips: c, debugIndex: d};
 	});
 var _mmachenry$nat_bee_viz$Main$Image = {ctor: 'Image'};
 var _mmachenry$nat_bee_viz$Main$Edit = {ctor: 'Edit'};
-var _mmachenry$nat_bee_viz$Main$initModel = {
-	csvFilename: _elm_lang$core$Maybe$Nothing,
-	error: _elm_lang$core$Maybe$Nothing,
-	beeTrips: {ctor: '[]'},
-	currentTab: _mmachenry$nat_bee_viz$Main$Edit
+var _mmachenry$nat_bee_viz$Main$Increment = {ctor: 'Increment'};
+var _mmachenry$nat_bee_viz$Main$Decrement = {ctor: 'Decrement'};
+var _mmachenry$nat_bee_viz$Main$debugView = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_mmachenry$nat_bee_viz$Main$Decrement),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('-'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									_elm_lang$core$Basics$toString(model.debugIndex)),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_mmachenry$nat_bee_viz$Main$Increment),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('+'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: function () {
+					var _p3 = _elm_lang$core$List$head(model.beeTrips);
+					if (_p3.ctor === 'Just') {
+						var _p4 = _elm_lang$core$List$head(
+							A2(_elm_lang$core$List$drop, model.debugIndex, model.beeTrips));
+						if (_p4.ctor === 'Just') {
+							var _p5 = _p4._0;
+							return A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$div,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												_elm_lang$core$Basics$toString(_p5)),
+											_1: {ctor: '[]'}
+										}),
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(
+													_elm_lang$core$Basics$toString(
+														A2(
+															_mmachenry$nat_bee_viz$DrawBee$tripToArcData,
+															_elm_community$elm_time$Time_DateTime$date(_p3._0.start),
+															_p5))),
+												_1: {ctor: '[]'}
+											}),
+										_1: {
+											ctor: '::',
+											_0: _mmachenry$nat_bee_viz$Main$imageView(
+												{
+													ctor: '::',
+													_0: _p5,
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
+									}
+								});
+						} else {
+							return A2(
+								_elm_lang$html$Html$div,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('No data'),
+									_1: {ctor: '[]'}
+								});
+						}
+					} else {
+						return A2(
+							_elm_lang$html$Html$div,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Empty list'),
+								_1: {ctor: '[]'}
+							});
+					}
+				}(),
+				_1: {ctor: '[]'}
+			}
+		});
 };
 var _mmachenry$nat_bee_viz$Main$CSVParse = function (a) {
 	return {ctor: 'CSVParse', _0: a};
@@ -13700,11 +13822,11 @@ var _mmachenry$nat_bee_viz$Main$fileUpload = function (model) {
 					{
 						ctor: '::',
 						_0: function () {
-							var _p7 = model.error;
-							if (_p7.ctor === 'Nothing') {
+							var _p6 = model.error;
+							if (_p6.ctor === 'Nothing') {
 								return _elm_lang$html$Html$text('');
 							} else {
-								return _elm_lang$html$Html$text(_p7._0);
+								return _elm_lang$html$Html$text(_p6._0);
 							}
 						}(),
 						_1: {ctor: '[]'}
@@ -13739,7 +13861,7 @@ var _mmachenry$nat_bee_viz$Main$view = function (model) {
 			_0: _mmachenry$nat_bee_viz$Main$fileUpload(model),
 			_1: {
 				ctor: '::',
-				_0: A2(
+				_0: false ? _mmachenry$nat_bee_viz$Main$debugView(model) : A2(
 					_elm_lang$html$Html$div,
 					{ctor: '[]'},
 					A2(
@@ -13769,77 +13891,6 @@ var _mmachenry$nat_bee_viz$Main$main = _elm_lang$html$Html$program(
 		update: _mmachenry$nat_bee_viz$Main$update,
 		subscriptions: _mmachenry$nat_bee_viz$Main$subscriptions
 	})();
-var _mmachenry$nat_bee_viz$Main$ChangeTab = function (a) {
-	return {ctor: 'ChangeTab', _0: a};
-};
-var _mmachenry$nat_bee_viz$Main$buttonBar = function (tab) {
-	var makeButton = function (_p8) {
-		var _p9 = _p8;
-		var _p10 = _p9._0;
-		return A2(
-			_elm_lang$html$Html$button,
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'padding', _1: '10px'},
-						_1: {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: 'color',
-								_1: _elm_lang$core$Native_Utils.eq(tab, _p10) ? 'grey' : 'white'
-							},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'blue'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'border', _1: 'none'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'margin', _1: '2px'},
-										_1: {ctor: '[]'}
-									}
-								}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$disabled(
-						_elm_lang$core$Native_Utils.eq(tab, _p10)),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(
-							_mmachenry$nat_bee_viz$Main$ChangeTab(_p10)),
-						_1: {ctor: '[]'}
-					}
-				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(_p9._1),
-				_1: {ctor: '[]'}
-			});
-	};
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(
-			_elm_lang$core$List$map,
-			makeButton,
-			{
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: _mmachenry$nat_bee_viz$Main$Edit, _1: 'Edit'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: _mmachenry$nat_bee_viz$Main$Image, _1: 'Image'},
-					_1: {ctor: '[]'}
-				}
-			}));
-};
 
 var Elm = {};
 Elm['Main'] = Elm['Main'] || {};
